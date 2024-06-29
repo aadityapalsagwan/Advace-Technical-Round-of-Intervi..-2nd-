@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Feedback for Conference</title>
+    <link rel="stylesheet" href="./CSS/postconf.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="container">
+                <a href="#" class="logo">Conference App</a>
+                <ul class="nav-links">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Schedule</a></li>
+                    <li><a href="#">Feedback</a></li>
+                    <li><a href="#">Admin</a></li>
+                    <li><a href="#">Register</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="feedback-form-container">
+            <h2>Submit Feedback for Conference</h2>
+            <form id="feedbackForm" class="feedback-form">
+                <input type="hidden" id="conferenceId" name="conferenceId" value="667c05bd09eaabf13d24e1d9">
+                <div class="form-group">
+                    <label for="userId">User ID:</label>
+                    <input type="text" id="userId" name="userId" required>
+                </div>
+                <div class="form-group">
+                    <label for="comment">Comment:</label>
+                    <textarea id="comment" name="comment" required></textarea>
+                </div>
+                <button type="submit">Submit Feedback</button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const feedbackForm = document.getElementById('feedbackForm');
+            feedbackForm.addEventListener('submit', submitFeedback);
+        });
+
+        function submitFeedback(event) {
+            event.preventDefault();
+
+            const formData = {
+                userId: document.getElementById('userId').value,
+                comment: document.getElementById('comment').value,
+            };
+
+            const conferenceId = document.getElementById('conferenceId').value;
+
+            fetch(`http://localhost:3000/api/conferences/${conferenceId}/feedback`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Network response was not ok', response.statusText);
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Feedback submitted:', data);
+                alert('Feedback submitted successfully!');
+                document.getElementById('feedbackForm').reset();
+            })
+            .catch(error => {
+                console.error('Error submitting feedback:', error);
+                alert(`Failed to submit feedback. Please try again. Error: ${error.message}`);
+            });
+        }
+    </script>
+</body>
+</html>

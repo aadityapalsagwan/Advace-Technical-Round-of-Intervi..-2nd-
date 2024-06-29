@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conference Details</title>
+    <link rel="stylesheet" href="./CSS/conf.css">
+</head>
+<body>
+    <!-- Section 1: Header -->
+    <header>
+        <nav class="navbar">
+            <div class="container">
+                <a href="#" class="logo" style="color: white;">Conference App</a>
+                <ul class="nav-links">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Schedule</a></li>
+                    <li><a href="#">Feedback</a></li>
+                    <li><a href="#">Admin</a></li>
+                    <li><a href="#">Register</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Section 2: Main Content -->
+    <main>
+        <!-- Section 3: Conference Details -->
+        <div class="conference-details">
+            <h2>Conference Details</h2>
+            <div id="conferenceInfo" class="conference-info">
+                <!-- Conference information will be inserted here -->hre
+            </div>
+        </div>
+
+        <!-- Section 4: Attendees List -->
+        <div class="attendees-list">
+            <h2>Attendees</h2>
+            <div id="attendeesList" class="attendees-list">
+                <!-- List of attendees will be inserted here -->
+            </div>
+        </div>
+
+        <!-- Section 5: Feedback Section -->
+        <div class="feedback-section">
+            <h2>Feedback</h2>
+            <div id="feedbackList" class="feedback-list">
+                <!-- Feedback comments will be inserted here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Section 6: JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Fetch conference data from backend
+            fetchConferenceData();
+        });
+        
+        function fetchConferenceData() {
+            fetch('http://localhost:3000/api/conferences/') // Adjust URL as per your backend API endpoint
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Display conference information
+                    displayConferences(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching conference data:', error);
+                    alert('Failed to fetch conference data. Please try again later.');
+                });
+        }
+        
+        function displayConferences(conferences) {
+            const conferenceInfoContainer = document.getElementById('conferenceInfo');
+            conferenceInfoContainer.innerHTML = '';
+        
+            conferences.forEach(conference => {
+                const conferenceDiv = document.createElement('div');
+                conferenceDiv.classList.add('conference-item');
+                conferenceDiv.innerHTML = `
+                    <h3> ➡️${conference.title}</h3>
+                    <p><strong>Date:</strong> ${new Date(conference.date).toLocaleDateString()}</p>
+                    <p><strong>Description:</strong> ${conference.description}</p>
+                `;
+                
+                // Display attendees for each conference
+                const attendeesListContainer = document.getElementById('attendeesList');
+                const attendeesList = document.createElement('ul');
+                attendeesList.classList.add('attendees-list');
+                conference.attendees.forEach(attendee => {
+                    const attendeeItem = document.createElement('li');
+                    attendeeItem.textContent = `${conference.title} ➡️ (${attendee.email})`;
+                    attendeesList.appendChild(attendeeItem);
+                });
+                attendeesListContainer.appendChild(attendeesList);
+        
+                // Display feedback for each conference
+                const feedbackListContainer = document.getElementById('feedbackList');
+                const feedbackList = document.createElement('ul');
+                feedbackList.classList.add('feedback-list');
+                conference.feedback.forEach(comment => {
+                    const feedbackItem = document.createElement('li');
+                    feedbackItem.textContent = ` ${conference.title} ➡️  ${comment.comment} - ${new Date(comment.createdAt).toLocaleString()}`;
+                    feedbackList.appendChild(feedbackItem);
+                });
+                feedbackListContainer.appendChild(feedbackList);
+        
+                conferenceInfoContainer.appendChild(conferenceDiv);
+            });
+        }
+    </script>
+</body>
+</html>

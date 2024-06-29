@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register for Conference</title>
+    <link rel="stylesheet" href="./CSS/postconf.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="container">
+                <a href="#" class="logo">Conference App</a>
+                <ul class="nav-links">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Schedule</a></li>
+                    <li><a href="#">Feedback</a></li>
+                    <li><a href="#">Admin</a></li>
+                    <li><a href="#">Register</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="register-form-container">
+            <h2>Register for Conference</h2>
+            <form id="registerForm" class="register-form">
+                <input type="hidden" id="conferenceId" name="conferenceId" value="667c05bd09eaabf13d24e1d9">
+                <div class="form-group">
+                    <label for="userId">User ID:</label>
+                    <input type="text" id="userId" name="userId" required>
+                </div>
+                <!-- <div class="form-group">
+                    <label for="comment">Comment:</label>
+                    <textarea id="comment" name="comment"></textarea>
+                </div> -->
+                <button type="submit">Register</button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const registerForm = document.getElementById('registerForm');
+            registerForm.addEventListener('submit', registerForConference);
+        });
+
+        function registerForConference(event) {
+            event.preventDefault();
+
+            const formData = {
+                userId: document.getElementById('userId').value
+             //  comment: document.getElementById('comment').value,
+            };
+
+            const conferenceId = document.getElementById('conferenceId').value;
+
+            fetch(`http://localhost:3000/api/conferences/${conferenceId}/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Network response was not ok', response.statusText);
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Registered for conference:', data);
+                alert('Successfully registered for the conference!');
+                document.getElementById('registerForm').reset();
+            })
+            .catch(error => {
+                console.error('Error registering for conference:', error);
+                alert(`Failed to register for the conference. Please try again. Error: ${error.message}`);
+            });
+        }
+    </script>
+</body>
+</html>

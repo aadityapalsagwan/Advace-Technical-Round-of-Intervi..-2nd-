@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Conference</title>
+    <link rel="stylesheet" href="./CSS/postconf.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="container">
+                <a href="#" class="logo">Conference App</a>
+                <ul class="nav-links">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Schedule</a></li>
+                    <li><a href="#">Feedback</a></li>
+                    <li><a href="#">Admin</a></li>
+                    <li><a href="#">Register</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="conference-form-container">
+            <h2>Add Conference</h2>
+            <form id="conferenceForm" class="conference-form">
+                <div class="form-group">
+                    <label for="title">Title:</label>
+                    <input type="text" id="title" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="date">Date:</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description:</label>
+                    <textarea id="description" name="description" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="attendees">Attendees (comma-separated emails):</label>
+                    <input type="text" id="attendees" name="attendees">
+                    <small class="form-text">Separate multiple emails with commas.</small>
+                </div>
+                <div class="form-group">
+                    <label for="feedback">Feedback:</label>
+                    <div id="feedbackContainer">
+                        <textarea class="feedback" name="feedback"></textarea>
+                    </div>
+                    <button type="button" id="addFeedbackButton">Add More Feedback</button>
+                </div>
+                <button type="submit">Add Conference</button>
+                <p>If you add the conference then you go to the <a href="./Conference.html">Conference Details</a></p>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const conferenceForm = document.getElementById('conferenceForm');
+            const addFeedbackButton = document.getElementById('addFeedbackButton');
+
+            conferenceForm.addEventListener('submit', addConference);
+            addFeedbackButton.addEventListener('click', addFeedbackField);
+        });
+
+        function addFeedbackField() {
+            const feedbackContainer = document.getElementById('feedbackContainer');
+            const newFeedbackField = document.createElement('textarea');
+            newFeedbackField.className = 'feedback';
+            newFeedbackField.name = 'feedback';
+            feedbackContainer.appendChild(newFeedbackField);
+        }
+
+        function addConference(event) {
+            event.preventDefault();
+
+            const feedbackFields = document.querySelectorAll('.feedback');
+            const feedbackArray = Array.from(feedbackFields).map(field => ({ comment: field.value.trim() }));
+
+            const formData = {
+                title: document.getElementById('title').value,
+                date: document.getElementById('date').value,
+                description: document.getElementById('description').value,
+                attendees: document.getElementById('attendees').value.split(',').map(email => email.trim()),
+                feedback: feedbackArray
+            };
+
+            fetch('http://localhost:3000/api/conferences/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Conference added:', data);
+                alert('Conference added successfully!');
+                document.getElementById('conferenceForm').reset();
+                document.getElementById('feedbackContainer').innerHTML = '<textarea class="feedback" name="feedback"></textarea>';
+            })
+            .catch(error => {
+                console.error('Error adding conference:', error);
+                alert('Failed to add conference. Please try again.');
+            });
+        }
+    </script>
+</body>
+</html>
